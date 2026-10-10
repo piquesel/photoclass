@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photos de Classe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+
+  <!-- ── Écran de connexion ─────────────────────────────────────────────── -->
+  <div id="loginScreen" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl border border-gray-700">
+      <div class="text-center mb-6">
+        <div class="text-4xl mb-3">📷</div>
+        <h1 class="text-2xl font-bold">Photos de Classe</h1>
+        <p class="text-gray-400 text-sm mt-1">Accès réservé aux anciens camarades</p>
+      </div>
+      <div class="space-y-3">
+        <input id="loginPassword" type="password" placeholder="Mot de passe"
+          autocomplete="current-password"
+          class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3
+                 focus:outline-none focus:border-blue-500 transition text-white placeholder-gray-500"
+          onkeydown="if(event.key==='Enter') login()">
+        <button onclick="login()"
+          class="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700
+                 text-white font-semibold py-3 rounded-lg transition">
+          Entrer
+        </button>
+        <p id="loginError" class="text-red-400 text-center text-sm hidden">
+          Mot de passe incorrect
+        </p>
+        <p id="debugBadge" class="hidden text-center">
+          <span class="bg-yellow-800 text-yellow-300 text-xs font-mono px-2 py-0.5 rounded">
+            MODE DEBUG — mot de passe ignoré
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Application principale ────────────────────────────────────────── -->
+  <div id="app" class="hidden min-h-screen flex flex-col">
+
+    <!-- En-tête -->
+    <header class="bg-gray-800 border-b border-gray-700 px-4 py-3 flex-shrink-0">
+      <div class="max-w-screen-xl mx-auto flex items-center justify-between gap-4">
+        <h1 class="text-lg font-bold whitespace-nowrap">📷 Photos de Classe</h1>
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 text-sm text-gray-400 cursor-pointer select-none">
+            <input type="checkbox" id="editToggle" class="w-4 h-4 accent-blue-500"
+                   onchange="toggleEditMode(this.checked)">
+            Mode édition
+          </label>
+          <button onclick="logout()"
+            class="text-sm text-gray-400 hover:text-white transition">
+            Déconnexion
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Onglets -->
+    <div class="bg-gray-800 border-b border-gray-700 flex-shrink-0">
+      <div class="max-w-screen-xl mx-auto px-4">
+        <div id="tabs" class="flex gap-1 overflow-x-auto py-2 scrollbar-hide"></div>
+      </div>
+    </div>
+
+    <!-- Bannière mode édition -->
+    <div id="editBanner" class="hidden flex-shrink-0">
+      <div class="max-w-screen-xl mx-auto px-4 pt-3">
+        <div class="bg-yellow-900/50 border border-yellow-700/60 rounded-lg px-4 py-2
+                    text-yellow-300 text-sm flex items-center justify-between">
+          <span>Mode édition — faites glisser les numéros pour les repositionner sur les personnes.</span>
+          <button onclick="resetPositions()"
+            class="ml-4 underline underline-offset-2 hover:text-yellow-100 transition whitespace-nowrap">
+            Réinitialiser positions
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <main class="max-w-screen-xl mx-auto w-full p-4 flex-1">
+      <div class="flex flex-col lg:flex-row gap-4 h-full">
+
+        <!-- Zone photo -->
+        <div class="flex-1 min-w-0">
+          <div id="photoContainer" class="relative bg-gray-800 rounded-xl overflow-hidden
+                                          border border-gray-700 select-none">
+            <img id="classPhoto" src="" alt="Photo de classe"
+                 class="w-full h-auto block" draggable="false">
+            <div id="markersLayer" class="absolute inset-0 pointer-events-none"></div>
+          </div>
+        </div>
+
+        <!-- Panneau de saisie -->
+        <div class="lg:w-80 xl:w-96 flex-shrink-0">
+          <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col
+                      max-h-[85vh] lg:sticky lg:top-4">
+            <!-- Titre + bouton -->
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700 flex-shrink-0">
+              <h2 id="formTitle" class="font-semibold"></h2>
+              <button onclick="saveData()" id="saveBtn"
+                class="bg-green-600 hover:bg-green-500 active:bg-green-700
+                       text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition">
+                Enregistrer
+              </button>
+            </div>
+            <!-- En-têtes colonnes -->
+            <div class="px-3 py-1.5 border-b border-gray-700/50 text-xs text-gray-500 flex-shrink-0">
+              <div class="flex items-center gap-2">
+                <span class="w-6 flex-shrink-0"></span>
+                <span class="flex-1">Prénom</span>
+                <span class="flex-1">Nom</span>
+              </div>
+              <div class="pl-8 mt-0.5 text-gray-600">Commentaire</div>
+            </div>
+            <!-- Liste des personnes -->
+            <div id="namesList" class="overflow-y-auto flex-1 px-2 py-2 space-y-0.5"></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

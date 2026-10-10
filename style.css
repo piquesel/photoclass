@@ -1,0 +1,57 @@
+/* Marqueurs numérotés sur la photo */
+.marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  background: rgba(59, 130, 246, 0.82);
+  border: 2px solid #93c5fd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: white;
+  cursor: default;
+  user-select: none;
+  z-index: 10;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  transition: transform 0.1s, background 0.1s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.marker:hover {
+  transform: translate(-50%, -50%) scale(1.35);
+  background: rgba(37, 99, 235, 0.95);
+  z-index: 20;
+}
+
+.marker.edit-mode {
+  cursor: grab;
+}
+
+.marker.edit-mode:active {
+  cursor: grabbing;
+}
+
+.marker.highlighted {
+  transform: translate(-50%, -50%) scale(1.45);
+  background: rgba(234, 179, 8, 0.92) !important;
+  border-color: #fef08a !important;
+  z-index: 30;
+}
+
+/* Ligne du formulaire survolée */
+.name-row.highlighted {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-radius: 6px;
+}
+
+/* Scrollbar discrète dans le panneau */
+#namesList::-webkit-scrollbar { width: 4px; }
+#namesList::-webkit-scrollbar-track { background: transparent; }
+#namesList::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 2px; }
+
+/* Toast fade-out */
+.toast { transition: opacity 0.3s ease; }
