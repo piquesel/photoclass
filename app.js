@@ -6,6 +6,8 @@ const STORAGE_POS  = 'photosclasse_positions';
 let currentClassId = null;
 let isEditMode     = false;
 let dragState      = null;
+let revealed       = new Set(); // 'id-field' des champs démasqués individuellement
+let allRevealed    = false;
 
 // ── Initialisation ────────────────────────────────────────────────────────────
 
@@ -85,6 +87,12 @@ function switchClass(classId) {
   const cls = CONFIG.classes.find(c => c.id === classId);
   document.getElementById('formTitle').textContent = cls.label;
   document.getElementById('classPhoto').src = cls.photo;
+
+  // Réinitialise le masquage à chaque changement d'onglet
+  revealed = new Set();
+  allRevealed = false;
+  const revBtn = document.getElementById('revealAllBtn');
+  if (revBtn) revBtn.textContent = '👁 Révéler tout';
 
   renderMarkers();
   renderForm();
@@ -233,6 +241,39 @@ function toggleEditMode(on) {
   renderMarkers();
 }
 
+// ── Révélation des champs ─────────────────────────────────────────────────────
+
+function overlayHtml(id, field, small = false) {
+  if (allRevealed || revealed.has(`${id}-${field}`)) return '';
+  const bg = small
+    ? 'bg-gray-700/70 hover:bg-gray-600/80'
+    : 'bg-gray-700 hover:bg-gray-600';
+  return `<div id="ov-${id}-${field}"
+    class="reveal-overlay absolute inset-0 ${bg} rounded flex items-center justify-center
+           cursor-pointer transition select-none"
+    onclick="revealField(${id}, '${field}')">
+    <span class="text-gray-500 text-xs tracking-widest">···</span>
+  </div>`;
+}
+
+function revealField(id, field) {
+  revealed.add(`${id}-${field}`);
+  document.getElementById(`ov-${id}-${field}`)?.remove();
+}
+
+function toggleRevealAll() {
+  allRevealed = !allRevealed;
+  const btn = document.getElementById('revealAllBtn');
+  if (allRevealed) {
+    document.querySelectorAll('.reveal-overlay').forEach(o => o.remove());
+    btn.textContent = '🙈 Tout masquer';
+  } else {
+    revealed = new Set();
+    renderForm();
+    btn.textContent = '👁 Révéler tout';
+  }
+}
+
 // ── Formulaire de saisie ──────────────────────────────────────────────────────
 
 function loadData() {
@@ -264,20 +305,29 @@ function renderForm() {
       <div class="flex items-center gap-2">
         <span class="w-6 h-6 flex-shrink-0 bg-blue-600/80 rounded-full flex items-center justify-center
                      text-xs font-bold leading-none">${i}</span>
-        <input type="text" placeholder="Prénom" value="${esc(p.prenom || '')}"
-          class="flex-1 min-w-0 bg-gray-700 border border-gray-600/70 rounded px-2 py-1 text-sm
-                 focus:outline-none focus:border-blue-500 transition"
-          oninput="persistField('${currentClassId}', ${i}, 'prenom', this.value)">
-        <input type="text" placeholder="Nom" value="${esc(p.nom || '')}"
-          class="flex-1 min-w-0 bg-gray-700 border border-gray-600/70 rounded px-2 py-1 text-sm
-                 focus:outline-none focus:border-blue-500 transition"
-          oninput="persistField('${currentClassId}', ${i}, 'nom', this.value)">
+        <div class="relative flex-1 min-w-0">
+          <input type="text" placeholder="Prénom" value="${esc(p.prenom || '')}"
+            class="w-full bg-gray-700 border border-gray-600/70 rounded px-2 py-1 text-sm
+                   focus:outline-none focus:border-blue-500 transition"
+            oninput="persistField('${currentClassId}', ${i}, 'prenom', this.value)">
+          ${overlayHtml(i, 'prenom')}
+        </div>
+        <div class="relative flex-1 min-w-0">
+          <input type="text" placeholder="Nom" value="${esc(p.nom || '')}"
+            class="w-full bg-gray-700 border border-gray-600/70 rounded px-2 py-1 text-sm
+                   focus:outline-none focus:border-blue-500 transition"
+            oninput="persistField('${currentClassId}', ${i}, 'nom', this.value)">
+          ${overlayHtml(i, 'nom')}
+        </div>
       </div>
       <div class="flex items-center gap-2 mt-0.5 pl-8">
-        <input type="text" placeholder="Commentaire (surnom, signe distinctif…)" value="${esc(p.commentaire || '')}"
-          class="flex-1 min-w-0 bg-gray-700/60 border border-gray-600/50 rounded px-2 py-0.5 text-xs
-                 text-gray-300 placeholder-gray-500 focus:outline-none focus:border-blue-500/70 transition"
-          oninput="persistField('${currentClassId}', ${i}, 'commentaire', this.value)">
+        <div class="relative flex-1 min-w-0">
+          <input type="text" placeholder="Commentaire (surnom, signe distinctif…)" value="${esc(p.commentaire || '')}"
+            class="w-full bg-gray-700/60 border border-gray-600/50 rounded px-2 py-0.5 text-xs
+                   text-gray-300 placeholder-gray-500 focus:outline-none focus:border-blue-500/70 transition"
+            oninput="persistField('${currentClassId}', ${i}, 'commentaire', this.value)">
+          ${overlayHtml(i, 'commentaire', true)}
+        </div>
       </div>
     `;
 

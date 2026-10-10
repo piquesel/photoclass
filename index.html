@@ -100,14 +100,21 @@
         <div class="lg:w-80 xl:w-96 flex-shrink-0">
           <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col
                       max-h-[85vh] lg:sticky lg:top-4">
-            <!-- Titre + bouton -->
+            <!-- Titre + boutons -->
             <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700 flex-shrink-0">
               <h2 id="formTitle" class="font-semibold"></h2>
-              <button onclick="saveData()" id="saveBtn"
-                class="bg-green-600 hover:bg-green-500 active:bg-green-700
-                       text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition">
-                Enregistrer
-              </button>
+              <div class="flex items-center gap-2">
+                <button onclick="toggleRevealAll()" id="revealAllBtn"
+                  class="text-sm px-3 py-1.5 rounded-lg border border-gray-600 text-gray-300
+                         hover:bg-gray-700 hover:text-white transition whitespace-nowrap">
+                  👁 Révéler tout
+                </button>
+                <button onclick="saveData()" id="saveBtn"
+                  class="bg-green-600 hover:bg-green-500 active:bg-green-700
+                         text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition">
+                  Enregistrer
+                </button>
+              </div>
             </div>
             <!-- En-têtes colonnes -->
             <div class="px-3 py-1.5 border-b border-gray-700/50 text-xs text-gray-500 flex-shrink-0">
