@@ -61,6 +61,31 @@ function showApp() {
   document.getElementById('app').classList.remove('hidden');
   renderTabs();
   switchClass(CONFIG.classes[0].id);
+  loadFromSheets();
+}
+
+// ── Chargement collaboratif depuis Google Sheets ──────────────────────────────
+
+async function loadFromSheets() {
+  if (!CONFIG.sheetsUrl) return;
+
+  // Indicateur de chargement dans le panneau
+  const list = document.getElementById('namesList');
+  list.innerHTML = '<p class="text-center text-gray-500 text-sm py-8">Chargement des données…</p>';
+
+  try {
+    const resp = await fetch(CONFIG.sheetsUrl);
+    const remote = await resp.json();
+    if (remote.error) throw new Error(remote.error);
+
+    // Le Sheet est la source de vérité — on remplace le cache local
+    localStorage.setItem(STORAGE_DATA, JSON.stringify(remote));
+
+  } catch (err) {
+    console.warn('[PhotosClasse] Chargement Google Sheets échoué, données locales utilisées :', err);
+  } finally {
+    renderForm(); // re-rend avec les données distantes ou locales selon ce qui a réussi
+  }
 }
 
 function renderTabs() {
