@@ -7,7 +7,7 @@ const CONFIG = {
    *         au lieu d'être envoyées à Google Sheets
    * false → mode production
    */
-  debug: true,
+  debug: false,
 
   /**
    * HASH SHA-256 du mot de passe
@@ -16,14 +16,15 @@ const CONFIG = {
    *   hashPassword('votre_mot_de_passe').then(h => console.log(h))
    * Puis collez le résultat ci-dessous.
    */
-  passwordHash: 'REMPLACER_PAR_VOTRE_HASH',
+  passwordHash: '5b17e0df8352af12e41be73ad8ff433d5324e52ffecdf2e1216e348d341c9d15',
 
   /**
    * URL du Web App Google Apps Script
    * Laissez vide en mode debug.
    * À renseigner après déploiement du script Apps Script.
    */
-  sheetsUrl: '',
+  
+  sheetsUrl: 'https://script.google.com/macros/s/AKfycbzfX5jsBRjuYYPL-ScR2XJww057-td75sYoPSEr0-APTi1kUsy6SZz0SMme7PIvKZ_8/exec',
 
   /**
    * Définition des classes
